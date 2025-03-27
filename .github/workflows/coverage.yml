@@ -1,4 +1,4 @@
-name: Run Tests and Generate Coverage Badge
+name: Coverage
 
 on:
   push:
@@ -11,6 +11,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      FLASK_ENV: test
     services:
       postgres:
         image: postgres:latest
