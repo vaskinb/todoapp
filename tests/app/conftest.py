@@ -112,7 +112,11 @@ def flask_app(request: Any) -> Flask:
 
 @pytest.fixture(scope="function")
 def client(flask_app: Flask) -> Any:
+    flask_app.config['TESTING'] = True
+    flask_app.config['PROPAGATE_EXCEPTIONS'] = False
+
     with flask_app.test_client() as client:
+        client.raise_on_exception = False
         yield client
 
 
