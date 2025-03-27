@@ -1,0 +1,644 @@
+{% extends "blank.html" %}
+
+{% block title %}
+    Todoapp - calendar
+{% endblock %}
+
+{% block head %}
+    <!-- Fullcalendar -->
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.6/index.global.min.js'></script>
+    <!-- fullcalendar -->
+
+    <style>
+
+        .fc-button {
+            background-color: #073c5c !important;
+        }
+        .fc-event {
+            color: black;
+            margin-bottom: 4px;  /* indent between events */
+            cursor: pointer;  /* pointer on every event */
+        }
+        .popover-header{
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .popover-content, .popover-body{
+            width: 200px;
+        }
+
+        .fc-daygrid-event {
+            min-height: 30px;
+            font-size: 14px;
+            padding: 5px;
+        }
+
+        .popover-header{
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .popover-content{
+            width: 180px;
+        }
+        .popover-buttons{
+            justify-content: space-between;
+        }
+
+    </style>
+
+
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="d-flex align-items-start align-items-md-center flex-column flex-md-row pt-2 pb-4">
+            <div>
+                <h3 class="fw-bold mb-3">Calendar</h3>
+                <h6 class="op-7 mb-2">Organize your tasks</h6>
+            </div>
+            <div class="ms-md-auto py-2 py-md-0">
+                <button class="btn btn-primary btn-round" data-bs-toggle="modal" data-bs-target="#task_modal">Add Task</button>
+            </div>
+        </div>
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<!-- Task Modal -->
+<div id="task_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Task Form</h5>
+            </div>
+            <div class="modal-body">
+                <form id="task_form" method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" id="task_id" name="task_id" value="">
+                    <div class="form-group">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control", id="task_title") }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", id="task_description") }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.status.label(class="form-label") }}
+                        {{ form.status(class="form-control", id="task_status") }}
+                        {% if form.status.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.status.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.due_date.label(class="form-label") }}
+                        {{ form.due_date(class="form-control", id="due_date") }}
+                        {% if form.due_date.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.due_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script>
+    /************************ Event colors ************************/
+    const colorDict = {
+        pending: "rgb(64, 153, 255)",
+        active: "rgb(255, 183, 3)",
+        completed: "rgb(50, 168, 82)"
+    };
+
+
+    /************************ Show notification ************************/
+    function showNotification(title, message, type, icon) {
+        $.notify({
+            title: title,
+            message: message,
+            icon: icon
+        }, {
+            type: type || "success",
+            placement: {
+                from: "bottom",
+                align: "right"
+            },
+            delay: 3500
+        });
+    }
+
+    /************************ Status buttons ************************/
+    const statusButtons = {
+        pending: {
+            iconClass: "fa-play text-primary",
+            title: "Start",
+            buttonClass: "start_task_btn"
+        },
+        active: {
+            iconClass: "fa-check text-success",
+            title: "Done",
+            buttonClass: "done_task_btn"
+        },
+        completed: {
+            iconClass: "fa-undo text-secondary",
+            title: "Undo",
+            buttonClass: "undo_task_btn"
+        }
+    };
+
+    /************************ Create popover button ************************/
+    function createButton(iconClass, title, className, eventId) {
+        const button = document.createElement("button");
+        button.classList.add("btn", "btn-icon", "rounded-pill", className);
+        button.innerHTML = `<i class="fas ${iconClass}"></i>`;
+        button.title = title;
+        button.dataset.id = eventId;
+        return button;
+    }
+
+    /************************ Create popover buttons ************************/
+    function createPopoverButtons(info) {
+        let eventId = info.event.id;
+        let eventStatus = info.event.extendedProps.status;
+        let buttonsContainer = document.createElement("div");
+        buttonsContainer.classList.add("popover-buttons", "d-flex", "justify-content-around");
+
+        // Add status button if exist
+        if (statusButtons[eventStatus]) {
+            let {
+                iconClass,
+                title,
+                buttonClass
+            } = statusButtons[eventStatus];
+            let statusButton = createButton(iconClass, title, buttonClass, eventId);
+            buttonsContainer.appendChild(statusButton);
+        }
+
+        // Add edit and delete buttons
+        let actionButtons = [{
+                icon: "fa-pencil-alt",
+                title: "Edit",
+                className: "edit_task"
+            },
+            {
+                icon: "fa-trash text-danger",
+                title: "Delete",
+                className: "delete_task"
+            }
+        ];
+
+        actionButtons.forEach(item => {
+            let btn = createButton(item.icon, item.title, item.className, eventId);
+            buttonsContainer.appendChild(btn);
+        });
+
+        return buttonsContainer;
+    }
+
+    /************************ Create popover content ************************/
+    function createPopoverContent(info) {
+        let content = document.createElement("div");
+        content.classList.add("popover-content");
+
+        // Add description if exist
+        if (info.event.extendedProps.description) {
+            let description = document.createElement("p");
+            description.textContent = info.event.extendedProps.description;
+            content.appendChild(description);
+        }
+
+        // Fix displaying start date
+        let startDate = new Date(info.event.start);
+        startDate.setDate(startDate.getDate() + 1);
+        let formattedDate = startDate.toISOString().split("T")[0];
+
+        let dateP = document.createElement("p");
+        dateP.style.display = "flex";
+        dateP.style.alignItems = "center";
+        dateP.style.gap = "5px";
+        dateP.style.width = "100%";
+        dateP.innerHTML = `<i class="fas fa-calendar-alt"></i> ${formattedDate}`;
+        content.appendChild(dateP);
+
+        return content;
+    }
+
+    /************************ Create popover title ************************/
+    function createPopoverTitle(info) {
+        let titleDiv = document.createElement("div");
+        titleDiv.textContent = info.event.title;
+        return titleDiv;
+    }
+
+
+    /******************** Attach popover to event element ********************/
+    function eventDidMount(info) {
+        const title = createPopoverTitle(info);
+        const content = createPopoverContent(info);
+        const buttonsContainer = createPopoverButtons(info);
+        if (buttonsContainer && buttonsContainer.children.length > 0) {
+            const hr = document.createElement("hr");
+            content.appendChild(hr);
+            content.appendChild(buttonsContainer);
+        }
+        $(info.el).popover({
+            title: title,
+            content: content,
+            trigger: "click",
+            placement: "auto",
+            container: "body",
+            html: true
+        });
+    }
+
+    /******************** Create calendar events ********************/
+    function createCalendarEvents() {
+        const events = [];
+        {% for task in tasks %}
+        events.push({
+            id: "{{ task.id }}",
+            title: "{{ task.title }}",
+            start: "{{ task.due_date or task.created_on }}",
+            allDay: true,
+            color: colorDict["{{ task.status }}"],
+            extendedProps: {
+                status: "{{ task.status }}",
+                description: "{{ task.description }}"
+            }
+        });
+        {% endfor %}
+        return events;
+    }
+
+    function EventDrop(info) {
+        const taskId = info.event.id;
+        let startDate = new Date(info.event.start);
+        startDate = new Date(startDate.setDate(startDate.getDate() + 1)).toISOString().split("T")[0];
+
+        const taskData = {
+            title: info.event.title,
+            description: info.event.extendedProps.description,
+            status: info.event.extendedProps.status,
+            due_date: startDate
+        };
+
+        $.ajax({
+            url: "{{ url_for('main.update_task', task_id=0) }}".replace("0", taskId),
+            type: "PUT",
+            contentType: "application/json",
+            data: JSON.stringify(taskData),
+            success: function() {
+                showNotification("Success", "Task date updated!", "success", "icon-check");
+            },
+            error: function() {
+                alert("Error updating task date.");
+                info.revert();
+            }
+        });
+    }
+
+
+    $(document).ready(function() {
+
+        /************************ Init calendar ************************/
+        const calendarEl = document.getElementById("calendar");
+        const calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: "dayGridMonth",
+            height: 1024,
+            firstDay: 1,
+            timeZone: 'local',
+            customButtons: {
+                CustomPrev: {
+                    text: "  <  ",
+                    click: function() {
+                        calendar.prev();
+                    }
+                },
+                CustomNext: {
+                    text: "  >  ",
+                    click: function() {
+                        calendar.next();
+                    }
+                }
+            },
+            headerToolbar: {
+                start: "CustomPrev,CustomNext,today",
+                center: "title",
+                end: "dayGridDay,dayGridWeek,dayGridMonth"
+            },
+            businessHours: {
+                daysOfWeek: [1, 2, 3, 4, 5],
+                startTime: "10:00",
+                endTime: "19:00"
+            },
+            validRange: {
+                start: "2025-01-01",
+                end: "2026-01-01"
+            },
+            events: createCalendarEvents(),
+            eventDisplay: "block",
+            selectable: true,
+            editable: true,
+            dayMaxEvents: 5,
+            droppable: true,
+            eventTimeFormat: {
+                hour: "numeric",
+                minute: "2-digit",
+                omitZeroMinute: false,
+                meridiem: "narrow"
+            },
+            displayEventEnd: true,
+            eventDidMount: eventDidMount,
+            eventClick: function(info) {
+                info.jsEvent.preventDefault();
+                eventDidMount(info);
+            },
+            eventDrop: EventDrop,
+        });
+        calendar.render();
+
+
+        /********************** Create/Update task form **********************/
+        $("#task_form").on("submit", function(event) {
+            event.preventDefault();
+            const taskData = {
+                title: $("#task_title").val(),
+                description: $("#task_description").val(),
+                status: $("#task_status").val(),
+                due_date: $("#due_date").val()
+            };
+
+            if ($("#task_id").val() === "") {
+                $.ajax({
+                    url: "{{ url_for('main.create_task') }}",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(taskData),
+                    success: function(task) {
+                        calendar.addEvent({
+                            id: task.id,
+                            title: task.title,
+                            start: task.due_date,
+                            allDay: true,
+                            color: colorDict[task.status],
+                            extendedProps: {
+                                status: task.status,
+                                description: task.description
+                            }
+                        });
+                        $("#task_modal").modal("hide");
+                        $("#task_form")[0].reset();
+                        showNotification("Success", "Task added successfully!", "success", "icon-check");
+                    },
+                    error: function() {
+                        alert("Error adding task.");
+                    }
+                });
+            } else {
+                const taskId = $("#task_id").val();
+                $.ajax({
+                    url: "{{ url_for('main.update_task', task_id=0) }}".replace("0", taskId),
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(taskData),
+                    success: function() {
+                        calendar.refetchEvents();
+                        const event = calendar.getEventById(taskId);
+                        if (event) {
+                            event.setProp("title", taskData.title);
+                            event.setExtendedProp("description", taskData.description);
+                            event.setExtendedProp("status", taskData.status);
+                            event.setStart(taskData.due_date);
+                            event.setProp("color", colorDict[taskData.status]);
+                        }
+                        $("#task_modal").modal("hide");
+                        $("#task_form")[0].reset();
+                        $("#task_id").val("");
+                        showNotification("Success", "Task edited successfully!", "success", "icon-check");
+                    },
+                    error: function() {
+                        alert("Error updating task.");
+                    }
+                });
+            }
+        });
+
+
+        /********************** Edit task **********************/
+        $(document).on("click", ".edit_task", function(event) {
+            event.preventDefault();
+            const taskId = $(this).data("id");
+            $.ajax({
+                url: "{{ url_for('main.get_task', task_id=0) }}".replace("0", taskId),
+                type: "GET",
+                success: function(task) {
+                    $("#task_id").val(task.id);
+                    $("#task_title").val(task.title);
+                    $("#task_description").val(task.description);
+                    $("#task_status").val(task.status);
+                    if (task.due_date) {
+                        const dueDate = new Date(task.due_date);
+                        $("#due_date").val(dueDate.toISOString().split("T")[0]);
+                    } else {
+                        $("#due_date").val("");
+                    }
+                    $(".popover").removeClass("show");
+                    $("#task_modal").modal("show");
+                },
+                error: function() {
+                    alert("Error fetching task data.");
+                }
+            });
+        });
+
+        /********************** Delete task  **********************/
+        $(document).on("click", ".delete_task", function(event) {
+            event.preventDefault();
+            const taskId = $(this).data("id");
+            swal({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                buttons: {
+                    confirm: {
+                        text: "Yes, delete it!",
+                        className: "btn btn-success"
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        visible: true,
+                        className: "btn btn-danger"
+                    }
+                }
+            }).then(function(Delete) {
+                if (Delete) {
+                    $.ajax({
+                        url: "{{ url_for('main.delete_task', task_id=0) }}".replace("0", taskId),
+                        type: "DELETE",
+                        success: function() {
+                            const event = calendar.getEventById(taskId);
+                            if (event) event.remove();
+                            swal({
+                                title: "Deleted!",
+                                text: "Your task has been deleted.",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success"
+                                    }
+                                }
+                            });
+                        },
+                        error: function() {
+                            swal({
+                                title: "Error!",
+                                text: "Task could not be deleted.",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger"
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        /********************** Start task  **********************/
+        $(document).on("click", ".start_task_btn", function(event) {
+            event.preventDefault();
+            const btn = $(this);
+            const taskId = btn.data("id");
+            $.ajax({
+                url: "{{ url_for('main.set_status', task_id=0) }}".replace("0", taskId),
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    status: "active"
+                }),
+                success: function() {
+                    const event = calendar.getEventById(taskId);
+                    if (event) {
+                        event.setExtendedProp("status", "active");
+                        event.setProp("color", colorDict["active"]);
+                    }
+                    btn.removeClass("btn-transparent start_task_btn")
+                        .addClass("btn-transparent done_task_btn")
+                        .html('<i class="fas fa-check text-success"></i>')
+                        .attr("title", "Done");
+                    showNotification("Success", "Task started!", "success", "icon-check");
+                },
+                error: function() {
+                    alert("Error starting task.");
+                }
+            });
+        });
+
+
+        /********************** Done task  **********************/
+        $(document).on("click", ".done_task_btn", function(event) {
+            event.preventDefault();
+            const btn = $(this);
+            const taskId = btn.data("id");
+            $.ajax({
+                url: "{{ url_for('main.set_status', task_id=0) }}".replace("0", taskId),
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    status: "completed"
+                }),
+                success: function() {
+                    const event = calendar.getEventById(taskId);
+                    if (event) {
+                        event.setExtendedProp("status", "completed");
+                        event.setProp("color", colorDict["completed"]);
+                    }
+                    btn.removeClass("btn-transparent done_task_btn")
+                        .addClass("btn-transparent undo_task_btn")
+                        .html('<i class="fas fa-undo text-secondary"></i>')
+                        .attr("title", "Undo");
+                    showNotification("Success", "Task marked as completed!", "success", "icon-check");
+                },
+                error: function() {
+                    alert("Error marking task as completed.");
+                }
+            });
+        });
+
+        /********************** Undo task  **********************/
+        $(document).on("click", ".undo_task_btn", function(event) {
+            event.preventDefault();
+            const btn = $(this);
+            const taskId = btn.data("id");
+            $.ajax({
+                url: "{{ url_for('main.set_status', task_id=0) }}".replace("0", taskId),
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    status: "pending"
+                }),
+                success: function() {
+                    const event = calendar.getEventById(taskId);
+                    if (event) {
+                        event.setExtendedProp("status", "pending");
+                        event.setProp("color", colorDict["pending"]);
+                    }
+                    btn.removeClass("btn-transparent undo_task_btn")
+                        .addClass("btn-transparent start_task_btn")
+                        .html('<i class="fas fa-play text-primary"></i>')
+                        .attr("title", "Start");
+                    showNotification("Success", "Task moved back to pending!", "success", "icon-check");
+                },
+                error: function() {
+                    alert("Error reverting task status.");
+                }
+            });
+        });
+
+        /**************** Close popover by clicking outside  *****************/
+        $(document).on("click", function(event) {
+            if ($(event.target).closest(".fc-event-title-container, .popover").length === 0) {
+                $(".popover").removeClass("show");
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}
+

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <title>{% block title %}Kaiadmin - Bootstrap 5 Admin Dashboard{% endblock %}</title>
+        <meta content="width=device-width, initial-scale=1.0, shrink-to-fit=no" name="viewport" />
+        <link rel="icon" href="{{ url_for('static', filename='assets/img/kaiadmin/favicon.ico') }}" type="image/x-icon" />
+        <!-- Fonts and icons -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/webfont/webfont.min.js') }}"></script>
+        <script>
+            WebFont.load({
+                google: {
+                    families: ["Public Sans:300,400,500,600,700"],
+                },
+                custom: {
+                    families: ["Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"],
+                    urls: ["{{ url_for('static', filename='assets/css/fonts.min.css') }}"],
+                },
+                active: function () {
+                    sessionStorage.fonts = true;
+                },
+            });
+        </script>
+        <!-- CSS Files -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/bootstrap.min.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/plugins.min.css') }}" />
+        <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/kaiadmin.min.css') }}" />
+        {% block head %} {% endblock %}
+    </head>
+    <body>
+        <div class="wrapper">
+            <!-- Sidebar -->
+            <div class="sidebar" data-background-color="dark">
+                <div class="sidebar-logo">
+                    <!-- Logo Header -->
+                    <div class="logo-header" data-background-color="dark">
+                        <a href="{{ url_for('main.index') }}" class="logo">
+                            <img src="{{ url_for('static', filename='assets/img/todoapp3.svg') }}" alt="navbar brand" class="navbar-brand" height="20" />
+                        </a>
+                        <div class="nav-toggle">
+                            <button class="btn btn-toggle toggle-sidebar">
+                                <i class="gg-menu-right"></i>
+                            </button>
+                            <button class="btn btn-toggle sidenav-toggler">
+                                <i class="gg-menu-left"></i>
+                            </button>
+                        </div>
+                        <button class="topbar-toggler more">
+                            <i class="gg-more-vertical-alt"></i>
+                        </button>
+                    </div>
+                    <!-- End Logo Header -->
+                </div>
+                <div class="sidebar-wrapper scrollbar scrollbar-inner">
+                    <div class="sidebar-content">
+                        <ul class="nav nav-secondary">
+                            {% if request.path == '/' %}
+                                <li class="nav-item active">
+                                    <a href="{{ url_for('main.index') }}" class="collapsed" aria-expanded="false">
+                                        <i class="fas fa-home"></i>
+                                        <p>Dashboard</p>
+                                    </a>
+                                </li>
+                            {% else %}
+                                <li class="nav-item">
+                                    <a href="{{ url_for('main.index') }}" class="collapsed" aria-expanded="false">
+                                        <i class="fas fa-home"></i>
+                                        <p>Dashboard</p>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% if request.path.startswith('/calendar') %}
+                                <li class="nav-item active">
+                                    <a href="{{ url_for('calendar.main') }}" class="collapsed" aria-expanded="false">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <p>Calendar</p>
+                                    </a>
+                                </li>
+                            {% else %}
+                                 <li class="nav-item">
+                                     <a href="{{ url_for('calendar.main') }}" class="collapsed" aria-expanded="false">
+                                         <i class="fas fa-calendar-check"></i>
+                                         <p>Calendar</p>
+                                     </a>
+                                </li>
+                            {% endif %}
+
+                            {% if request.path.startswith('/statistic') %}
+                                <li class="nav-item active">
+                                    <a href="{{ url_for('statistic.main') }}" class="collapsed" aria-expanded="false">
+                                        <i class="fas fa-signal"></i>
+                                        <p>Statistic</p>
+                                    </a>
+                                </li>
+                            {% else %}
+                                 <li class="nav-item">
+                                     <a href="{{ url_for('statistic.main') }}" class="collapsed" aria-expanded="false">
+                                         <i class="fas fa-signal"></i>
+                                         <p>Statistic</p>
+                                     </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+            <!-- End Sidebar -->
+            <div class="main-panel">
+                <div class="main-header">
+                    <div class="main-header-logo">
+                        <!-- Logo Header -->
+                        <div class="logo-header" data-background-color="dark">
+                            <a href="index.html" class="logo">
+                                <img src="{{ url_for('static', filename='assets/img/kaiadmin/logo_light.svg') }}" alt="navbar brand" class="navbar-brand" height="20" />
+                            </a>
+                            <div class="nav-toggle">
+                                <button class="btn btn-toggle toggle-sidebar">
+                                    <i class="gg-menu-right"></i>
+                                </button>
+                                <button class="btn btn-toggle sidenav-toggler">
+                                    <i class="gg-menu-left"></i>
+                                </button>
+                            </div>
+                            <button class="topbar-toggler more">
+                                <i class="gg-more-vertical-alt"></i>
+                            </button>
+                        </div>
+                        <!-- End Logo Header -->
+                    </div>
+                    <!-- Navbar Header -->
+                    <nav class="navbar navbar-header navbar-header-transparent navbar-expand-lg border-bottom">
+                        <div class="container-fluid">
+                            <ul class="navbar-nav topbar-nav ms-md-auto align-items-center">
+                                <li class="nav-item topbar-icon dropdown hidden-caret d-flex d-lg-none">
+                                    <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#" role="button" aria-expanded="false" aria-haspopup="true">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-search animated fadeIn">
+                                        <form class="navbar-left navbar-form nav-search">
+                                            <div class="input-group">
+                                                <input type="text" placeholder="Search ..." class="form-control" />
+                                            </div>
+                                        </form>
+                                    </ul>
+                                </li>
+                                <li class="nav-item topbar-user dropdown hidden-caret">
+                                    <a class="dropdown-toggle profile-pic" data-bs-toggle="dropdown" href="#" aria-expanded="false">
+                                        <div class="avatar-sm">
+                                            <img src="{{ url_for('static', filename='assets/img/user.png') }}" alt="..." class="avatar-img rounded-circle" />
+                                        </div>
+                                        <span class="profile-username">
+                                            <span class="op-7">Hi,</span>
+                                            <span class="fw-bold">{{ current_user.first_name }}</span>
+                                        </span>
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-user animated fadeIn">
+                                        <div class="dropdown-user-scroll scrollbar-outer">
+                                            <li>
+                                                <div class="user-box">
+                                                    <div class="avatar-lg">
+                                                        <img src="{{ url_for('static', filename='assets/img/user.png') }}" alt="image profile" class="avatar-img rounded" />
+                                                    </div>
+                                                    <div class="u-text">
+                                                        <h4>{{ current_user.first_name }} {{ current_user.last_name }}</h4>
+                                                        <p class="text-muted">{{ current_user.email }}</p>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="dropdown-divider"></div>
+                                                <a class="dropdown-item" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt text-primary"></i> Logout</a>
+                                            </li>
+                                        </div>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </nav>
+                    <!-- End Navbar -->
+                </div>
+
+                {% block content %}{% endblock %}
+
+                {% block footer %}
+                    <footer class="footer d-flex justify-content-center align-items-center">
+                        <div class="copyright">2025, made by <b>Bogdan Vaskin</b></div>
+                    </footer>
+                {% endblock %}
+            </div>
+        </div>
+
+        <!--   Core JS Files   -->
+        <script src="{{ url_for('static', filename='assets/js/core/jquery-3.7.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/core/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/core/bootstrap.min.js') }}"></script>
+        <!-- jQuery Scrollbar -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/jquery-scrollbar/jquery.scrollbar.min.js') }}"></script>
+        <!-- Chart JS -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/chart.js/chart.min.js') }}"></script>
+        <!-- jQuery Sparkline -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js') }}"></script>
+        <!-- Chart Circle -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/chart-circle/circles.min.js') }}"></script>
+        <!-- Datatables -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/datatables/datatables.min.js') }}"></script>
+        <!-- Bootstrap Notify -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js') }}"></script>
+        <!-- jQuery Vector Maps -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/jsvectormap/jsvectormap.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='assets/js/plugin/jsvectormap/world.js') }}"></script>
+        <!-- Sweet Alert -->
+        <script src="{{ url_for('static', filename='assets/js/plugin/sweetalert/sweetalert.min.js') }}"></script>
+        <!-- Kaiadmin JS -->
+        <script src="{{ url_for('static', filename='assets/js/kaiadmin.min.js') }}"></script>
+
+        {% block script %}{% endblock %}
+    </body>
+</html>

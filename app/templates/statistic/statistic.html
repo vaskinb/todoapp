@@ -1,0 +1,271 @@
+{% extends "blank.html" %}
+
+{% block title %}
+Statistics
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="d-flex align-items-start align-items-md-center flex-column flex-md-row pt-2 pb-4">
+            <div>
+                <h3 class="fw-bold mb-3">Task Statistics</h3>
+                <h6 class="op-7 mb-2">Review your progress</h6>
+            </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="row">
+            <!-- Total Tasks Card -->
+            <div class="col-sm-6 col-md-3">
+                <div class="card card-stats card-round">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-icon">
+                                <div class="icon-big text-center icon-primary bubble-shadow-small">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                            </div>
+                            <div class="col col-stats ms-3 ms-sm-0">
+                                <div class="numbers">
+                                    <p class="card-category">Total Tasks</p>
+                                    <h4 class="card-title">{{ stat.counts.total }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Pending Tasks Card -->
+            <div class="col-sm-6 col-md-3">
+                <div class="card card-stats card-round">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-icon">
+                                <div class="icon-big text-center icon-warning bubble-shadow-small">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                            </div>
+                            <div class="col col-stats ms-3 ms-sm-0">
+                                <div class="numbers">
+                                    <p class="card-category">Pending Tasks</p>
+                                    <h4 class="card-title">{{ stat.counts.pending }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Active Tasks Card -->
+            <div class="col-sm-6 col-md-3">
+                <div class="card card-stats card-round">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-icon">
+                                <div class="icon-big text-center icon-info bubble-shadow-small">
+                                    <i class="fas fa-play"></i>
+                                </div>
+                            </div>
+                            <div class="col col-stats ms-3 ms-sm-0">
+                                <div class="numbers">
+                                    <p class="card-category">Active Tasks</p>
+                                    <h4 class="card-title">{{ stat.counts.active }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Completed Tasks Card -->
+            <div class="col-sm-6 col-md-3">
+                <div class="card card-stats card-round">
+                    <div class="card-body">
+                        <div class="row align-items-center">
+                            <div class="col-icon">
+                                <div class="icon-big text-center icon-success bubble-shadow-small">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                            </div>
+                            <div class="col col-stats ms-3 ms-sm-0">
+                                <div class="numbers">
+                                    <p class="card-category">Completed Tasks</p>
+                                    <h4 class="card-title">{{ stat.counts.completed }}</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Charts Section -->
+        <div class="row mt-4">
+            <!-- Tasks per Day Chart -->
+            <div class="col-md-6">
+                <div class="card card-chart">
+                    <div class="card-header">
+                        <h4 class="card-title">Tasks per Day</h4>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="tasksPerDayChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Tasks per Week Chart -->
+            <div class="col-md-6">
+                <div class="card card-chart">
+                    <div class="card-header">
+                        <h4 class="card-title">Tasks per Week</h4>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="tasksPerWeekChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+
+    $(document).ready(function () {
+
+        /************************ Statistics Data ************************/
+        const stat = {{ stat|tojson }};
+        const dailyLabels = stat.daily.labels;
+        const dailyTotal = stat.daily.total;
+        const dailyCompleted = stat.daily.completed;
+        const weeklyLabels = stat.weekly.labels;
+        const weeklyTotal = stat.weekly.total;
+        const weeklyCompleted = stat.weekly.completed;
+
+        /************************ Create gradient ************************/
+        function createGradient(ctx, colorStart, colorEnd) {
+            const chartHeight = ctx.canvas.height;  // Отримуємо актуальну висоту canvas
+            const gradient = ctx.createLinearGradient(0, 0, 0, chartHeight);
+            gradient.addColorStop(0, colorStart);
+            gradient.addColorStop(1, colorEnd);
+            return gradient;
+        }
+
+        /************************ Tasks per day chart ************************/
+        const ctxDay = document.getElementById('tasksPerDayChart').getContext('2d');
+        const gradientTotalDay = createGradient(ctxDay, 'rgba(74, 144, 226, 0.8)', 'rgba(74, 144, 226, 0.2)');
+        const gradientCompletedDay = createGradient(ctxDay, 'rgba(126, 211, 33, 0.8)', 'rgba(126, 211, 33, 0.2)');
+
+        new Chart(ctxDay, {
+            type: 'line',
+            data: {
+                labels: dailyLabels,
+                datasets: [
+                    {
+                        label: 'Total Tasks',
+                        data: dailyTotal,
+                        backgroundColor: gradientTotalDay,
+                        borderColor: '#4A90E2',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Completed Tasks',
+                        data: dailyCompleted,
+                        backgroundColor: gradientCompletedDay,
+                        borderColor: '#7ED321',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#333',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#333' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                    },
+                    y: {
+                        ticks: { color: '#333' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                    }
+                }
+            }
+        });
+
+        /*********************** Tasks per week chart ************************/
+        const ctxWeek = document.getElementById('tasksPerWeekChart').getContext('2d');
+        const gradientTotalWeek = createGradient(ctxWeek, 'rgba(74, 144, 226, 0.8)', 'rgba(74, 144, 226, 0.2)');
+        const gradientCompletedWeek = createGradient(ctxWeek, 'rgba(126, 211, 33, 0.8)', 'rgba(126, 211, 33, 0.2)');
+
+        new Chart(ctxWeek, {
+            type: 'line',
+            data: {
+                labels: weeklyLabels,
+                datasets: [
+                    {
+                        label: 'Total Tasks',
+                        data: weeklyTotal,
+                        backgroundColor: gradientTotalWeek,
+                        borderColor: '#4A90E2',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    },
+                    {
+                        label: 'Completed Tasks',
+                        data: weeklyCompleted,
+                        backgroundColor: gradientCompletedWeek,
+                        borderColor: '#7ED321',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: true,
+                        labels: {
+                            color: '#333',
+                            font: {
+                                size: 14
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#333' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                    },
+                    y: {
+                        ticks: { color: '#333' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' }
+                    }
+                }
+            }
+        });
+
+    });
+
+</script>
+
+{% endblock %}

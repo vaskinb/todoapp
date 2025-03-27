@@ -1,0 +1,548 @@
+{% extends "blank.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="page-inner">
+        <div class="d-flex align-items-start align-items-md-center flex-column flex-md-row pt-2 pb-4">
+            <div>
+                <h3 class="fw-bold mb-3">Dashboard</h3>
+                <h6 class="op-7 mb-2">Manage your tasks list</h6>
+            </div>
+            <div class="ms-md-auto py-2 py-md-0">
+                <button class="btn btn-primary btn-round" data-bs-toggle="modal" data-bs-target="#task_modal">Add Task</button>
+            </div>
+        </div>
+
+        <!-- Nav Tabs -->
+        <ul class="nav nav-tabs" id="taskTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active" id="all-tab" data-bs-toggle="tab" href="#all" role="tab" aria-controls="all" aria-selected="true">All</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="pending-tab" data-bs-toggle="tab" href="#pending" role="tab" aria-controls="pending" aria-selected="false">Pending</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="active-tab" data-bs-toggle="tab" href="#active" role="tab" aria-controls="active" aria-selected="false">Active</a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" id="completed-tab" data-bs-toggle="tab" href="#completed" role="tab" aria-controls="completed" aria-selected="false">Completed</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="taskTabContent">
+            <!-- All Tasks -->
+            <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Title</th>
+                                        <th class="text-center" style="width: 120px; white-space: nowrap;">Due Date</th>
+                                        <th class="text-center" style="width: 100px; white-space: nowrap;">Status</th>
+                                        <th class="text-center" style="width: 150px; white-space: nowrap;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="task_list">
+                                    {% for task in tasks %}
+                                    <tr data-id="{{ task.id }}" data-status="{{ task.status }}">
+                                        <td><strong>{{ task.title }}</strong></td>
+                                        <td class="text-center" style="width: 120px; white-space: nowrap;">
+                                            {% if task.due_date %}
+                                                <span>{{ task.due_date.strftime("%Y-%m-%d") }}</span>
+                                            {% else %}
+                                                <span>-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center" style="width: 100px; white-space: nowrap;">
+                                            {% if task.status == 'pending' %}
+                                                <span class="badge badge-info">Pending</span>
+                                            {% elif task.status == 'active' %}
+                                                <span class="badge badge-warning">Active</span>
+                                            {% elif task.status == 'completed' %}
+                                                <span class="badge badge-success">Completed</span>
+                                            {% endif %}
+                                        </td>
+                                        <td style="width: 150px; white-space: nowrap;">
+                                            <div class="d-flex gap-2 justify-content-end">
+                                                {% if task.status == 'pending' %}
+                                                    <button class="btn btn-sm btn-info start_task_btn" data-id="{{ task.id }}">Start</button>
+                                                {% elif task.status == 'active' %}
+                                                    <button class="btn btn-sm btn-success done_task_btn" data-id="{{ task.id }}">Done</button>
+                                                {% else %}
+                                                    <button class="btn btn-sm btn-secondary undo_task_btn" data-id="{{ task.id }}">Undo</button>
+                                                {% endif %}
+                                                <button class="btn btn-sm btn-primary edit_task_btn" data-id="{{ task.id }}">Edit</button>
+                                                <button class="btn btn-sm btn-danger delete_task_btn" data-id="{{ task.id }}">Delete</button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Pending Tasks -->
+            <div class="tab-pane fade" id="pending" role="tabpanel" aria-labelledby="pending-tab">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Title</th>
+                                        <th class="text-center" style="width: 120px; white-space: nowrap;">Due Date</th>
+                                        <th class="text-center" style="width: 100px; white-space: nowrap;">Status</th>
+                                        <th class="text-center" style="width: 150px; white-space: nowrap;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pending_task_list">
+                                    <!-- Filtered via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Active Tasks -->
+            <div class="tab-pane fade" id="active" role="tabpanel" aria-labelledby="active-tab">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Title</th>
+                                        <th class="text-center" style="width: 120px; white-space: nowrap;">Due Date</th>
+                                        <th class="text-center" style="width: 100px; white-space: nowrap;">Status</th>
+                                        <th class="text-center" style="width: 150px; white-space: nowrap;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="active_task_list">
+                                    <!-- Filtered via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Completed Tasks -->
+            <div class="tab-pane fade" id="completed" role="tabpanel" aria-labelledby="completed-tab">
+                <div class="card mt-3">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th class="text-start">Title</th>
+                                        <th class="text-center" style="width: 120px; white-space: nowrap;">Due Date</th>
+                                        <th class="text-center" style="width: 100px; white-space: nowrap;">Status</th>
+                                        <th class="text-center" style="width: 150px; white-space: nowrap;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completed_task_list">
+                                    <!-- Filtered via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Modal -->
+<div id="task_modal" class="modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Task Form</h5>
+            </div>
+            <div class="modal-body">
+                <form id="task_form" method="POST" novalidate>
+                    {{ form.hidden_tag() }}
+                    <input type="hidden" id="task_id" name="task_id" value="">
+                    <div class="form-group">
+                        {{ form.title.label(class="form-label") }}
+                        {{ form.title(class="form-control", id="task_title") }}
+                        {% if form.title.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.title.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.description.label(class="form-label") }}
+                        {{ form.description(class="form-control", id="task_description") }}
+                        {% if form.description.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.description.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.status.label(class="form-label") }}
+                        {{ form.status(class="form-control", id="task_status") }}
+                        {% if form.status.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.status.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        {{ form.due_date.label(class="form-label") }}
+                        {{ form.due_date(class="form-control", id="due_date") }}
+                        {% if form.due_date.errors %}
+                            <div class="invalid-feedback">
+                                {% for error in form.due_date.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+
+<script>
+
+    /******************** Get badge HTML for task status *********************/
+    function getBadge(status) {
+        if (status === "pending") {
+            return '<span class="badge badge-info">Pending</span>';
+        } else if (status === "active") {
+            return '<span class="badge badge-warning">Active</span>';
+        } else if (status === "completed") {
+            return '<span class="badge badge-success">Completed</span>';
+        } else {
+            return status;
+        }
+    }
+
+    /******************** Get actions HTML for task *********************/
+    function getActionsHtml(taskId, status) {
+        let btnHtml = "";
+        if (status === "pending") {
+            btnHtml = '<button class="btn btn-sm btn-info start_task_btn" data-id="' + taskId + '">Start</button>';
+        } else if (status === "active") {
+            btnHtml = '<button class="btn btn-sm btn-success done_task_btn" data-id="' + taskId + '">Done</button>';
+        } else if (status === "completed") {
+            btnHtml = '<button class="btn btn-sm btn-secondary undo_task_btn" data-id="' + taskId + '">Undo</button>';
+        }
+        return (
+            '<div class="d-flex gap-2 justify-content-end">' +
+            btnHtml +
+            '<button class="btn btn-sm btn-primary edit_task_btn" data-id="' + taskId + '">Edit</button>' +
+            '<button class="btn btn-sm btn-danger delete_task_btn" data-id="' + taskId + '">Delete</button>' +
+            '</div>'
+        );
+    }
+
+    /*********************** Render task row ************************/
+    function renderTask(task) {
+        return (
+            '<tr data-id="' + task.id + '" data-status="' + task.status + '">' +
+            '<td><strong>' + task.title + '</strong></td>' +
+            '<td class="text-center" style="width: 120px; white-space: nowrap;">' +
+            (task.due_date ? task.due_date : "-") +
+            '</td>' +
+            '<td class="text-center" style="width: 100px; white-space: nowrap;">' +
+            getBadge(task.status) +
+            '</td>' +
+            '<td style="width: 150px; white-space: nowrap;">' +
+            getActionsHtml(task.id, task.status) +
+            '</td>' +
+            '</tr>'
+        );
+    }
+
+    /*********************** Show notification ************************/
+    function showNotification(title, message, type, icon) {
+        $.notify({
+            title: title,
+            message: message,
+            icon: icon
+        }, {
+            type: type || "success",
+            placement: {
+                from: "bottom",
+                align: "right"
+            },
+            delay: 3500
+        });
+    }
+
+     /********************** Update task list in tabs ***********************/
+    function updateFilteredTabs() {
+        $("#pending_task_list, #active_task_list, #completed_task_list").empty();
+        $("#task_list tr").each(function() {
+            let status = $(this).data("status");
+            if (status === "pending") {
+                $("#pending_task_list").append($(this).clone(true));
+            } else if (status === "active") {
+                $("#active_task_list").append($(this).clone(true));
+            } else if (status === "completed") {
+                $("#completed_task_list").append($(this).clone(true));
+            }
+        });
+    }
+
+    $(document).ready(function() {
+
+        /************************ Update Table tabs ************************/
+        $("a[data-bs-toggle='tab']").on("shown.bs.tab", function(e) {
+            let tabId = $(e.target).attr("id");
+            if (tabId === "pending-tab" || tabId === "active-tab" || tabId === "completed-tab") {
+                updateFilteredTabs();
+            }
+        });
+
+        /************************ Submit Task Form ************************/
+        $("#task_form").on("submit", function(e) {
+            e.preventDefault();
+            let taskData = {
+                title: $("#task_title").val(),
+                description: $("#task_description").val(),
+                status: $("#task_status").val(),
+                due_date: $("#due_date").val()
+            };
+
+            if ($("#task_id").val() === "") {
+                // Create task
+                $.ajax({
+                    url: "{{ url_for('main.create_task') }}",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(taskData),
+                    success: function(task) {
+                        $("#task_list").prepend(renderTask(task));
+                        $("#task_modal").modal("hide");
+                        $("#task_form")[0].reset();
+                        showNotification("Success", "Task added successfully!", "success", "icon-check");
+                        updateFilteredTabs();
+                    },
+                    error: function() {
+                        alert("Error adding task.");
+                    }
+                });
+            } else {
+                // Update task
+                let taskId = $("#task_id").val();
+                $.ajax({
+                    url: "{{ url_for('main.update_task', task_id=0) }}".replace("0", taskId),
+                    type: "PUT",
+                    contentType: "application/json",
+                    data: JSON.stringify(taskData),
+                    success: function() {
+                        let row = $('#task_list tr[data-id="' + taskId + '"]');
+                        row.data("status", taskData.status);
+                        row.find("td").eq(0).html("<strong>" + taskData.title + "</strong>");
+                        row.find("td").eq(1).html(taskData.due_date ? taskData.due_date : "-");
+                        row.find("td").eq(2).html(getBadge(taskData.status));
+                        row.find("td").eq(3).html(getActionsHtml(taskId, taskData.status));
+                        $("#task_modal").modal("hide");
+                        $("#task_form")[0].reset();
+                        $("#task_id").val("");
+                        showNotification("Success", "Task edited successfully!", "success", "icon-check");
+                        updateFilteredTabs();
+                    },
+                    error: function() {
+                        alert("Error updating task.");
+                    }
+                });
+            }
+        });
+
+        /************************ Edit task ************************/
+        $(document).on("click", ".edit_task_btn", function(e) {
+            e.preventDefault();
+            let taskId = $(this).data("id");
+            $.ajax({
+                url: "{{ url_for('main.get_task', task_id=0) }}".replace("0", taskId),
+                type: "GET",
+                success: function(task) {
+                    $("#task_id").val(task.id);
+                    $("#task_title").val(task.title);
+                    $("#task_description").val(task.description);
+                    $("#task_status").val(task.status);
+                    // Convert date to YYYY-MM-DD format
+                    if (task.due_date) {
+                        let dueDate = new Date(task.due_date);
+                        let formattedDate = dueDate.toISOString().split("T")[0];
+                        $("#due_date").val(formattedDate);
+                    } else {
+                        $("#due_date").val("");
+                    }
+                    $("#task_modal").modal("show");
+                },
+                error: function() {
+                    swal({
+                        title: "Error!",
+                        text: "Error fetching task data.",
+                        icon: "error",
+                        buttons: {
+                            confirm: {
+                                className: "btn btn-danger"
+                            }
+                        }
+                    });
+                }
+            });
+        });
+
+        /************************ Delete task ************************/
+        $(document).on("click", ".delete_task_btn", function(e) {
+            e.preventDefault();
+            let taskId = $(this).data("id");
+            swal({
+                title: "Are you sure?",
+                text: "You won't be able to revert this!",
+                icon: "warning",
+                buttons: {
+                    confirm: {
+                        text: "Yes, delete it!",
+                        className: "btn btn-success"
+                    },
+                    cancel: {
+                        text: "Cancel",
+                        visible: true,
+                        className: "btn btn-danger"
+                    }
+                }
+            }).then(function(Delete) {
+                if (Delete) {
+                    $.ajax({
+                        url: "{{ url_for('main.delete_task', task_id=0) }}".replace("0", taskId),
+                        type: "DELETE",
+                        success: function() {
+                            $('#task_list tr[data-id="' + taskId + '"]').remove();
+                            swal({
+                                title: "Deleted!",
+                                text: "Your task has been deleted.",
+                                icon: "success",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-success"
+                                    }
+                                }
+                            });
+                            updateFilteredTabs();
+                        },
+                        error: function() {
+                            swal({
+                                title: "Error!",
+                                text: "Task could not be deleted.",
+                                icon: "error",
+                                buttons: {
+                                    confirm: {
+                                        className: "btn btn-danger"
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        /************************ Start task ************************/
+        $(document).on("click", ".start_task_btn", function(e) {
+            e.preventDefault();
+            let taskId = $(this).data("id");
+            $.ajax({
+                url: "{{ url_for('main.set_status', task_id=0) }}".replace("0", taskId),
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    status: "active"
+                }),
+                success: function() {
+                    let row = $('#task_list tr[data-id="' + taskId + '"]');
+                    row.data("status", "active");
+                    row.find("td").eq(2).html(getBadge("active"));
+                    row.find("td").eq(3).html(getActionsHtml(taskId, "active"));
+                    showNotification("Success", "Task started!", "success", "icon-check");
+                    updateFilteredTabs();
+                },
+                error: function() {
+                    alert("Error starting task.");
+                }
+            });
+        });
+
+        /************************ Done task ************************/
+        $(document).on("click", ".done_task_btn", function(e) {
+            e.preventDefault();
+            let taskId = $(this).data("id");
+            $.ajax({
+                url: "{{ url_for('main.set_status', task_id=0) }}".replace("0", taskId),
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    status: "completed"
+                }),
+                success: function() {
+                    let row = $('#task_list tr[data-id="' + taskId + '"]');
+                    row.data("status", "completed");
+                    row.find("td").eq(2).html(getBadge("completed"));
+                    row.find("td").eq(3).html(getActionsHtml(taskId, "completed"));
+                    showNotification("Success", "Task marked as completed!", "success", "icon-check");
+                    updateFilteredTabs();
+                },
+                error: function() {
+                    alert("Error marking task as completed.");
+                }
+            });
+        });
+
+        /************************ Undo task ************************/
+        $(document).on("click", ".undo_task_btn", function(e) {
+            e.preventDefault();
+            let taskId = $(this).data("id");
+            $.ajax({
+                url: "{{ url_for('main.set_status', task_id=0) }}".replace("0", taskId),
+                type: "PATCH",
+                contentType: "application/json",
+                data: JSON.stringify({
+                    status: "pending"
+                }),
+                success: function() {
+                    let row = $('#task_list tr[data-id="' + taskId + '"]');
+                    row.data("status", "pending");
+                    row.find("td").eq(2).html(getBadge("pending"));
+                    row.find("td").eq(3).html(getActionsHtml(taskId, "pending"));
+                    showNotification("Success", "Task moved back to pending!", "success", "icon-check");
+                    updateFilteredTabs();
+                },
+                error: function() {
+                    alert("Error reverting task status.");
+                }
+            });
+        });
+    });
+
+</script>
+
+{% endblock %}
