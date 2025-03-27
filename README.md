@@ -1,5 +1,10 @@
 # TODO APP
 
+![dashboard](https://github.com/user-attachments/assets/615f058a-2fda-4d64-8e16-3832553fca2f)
+![calendar](https://github.com/user-attachments/assets/923a9a4f-01df-4e83-b945-851ca4c5b066)
+![statistic](https://github.com/user-attachments/assets/ed860a72-b3ec-462d-a62a-7b2ef08e8f67)
+
+
 ### Вимоги
 
 1. Наявність python >= 3.11.0
