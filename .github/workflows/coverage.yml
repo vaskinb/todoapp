@@ -47,6 +47,7 @@ jobs:
 
       - name: Generate coverage badge
         run: |
+          source venv/bin/activate
           COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | awk '{print $1*100"%"}')
           anybadge --value=$COVERAGE --file=coverage.svg coverage
 
