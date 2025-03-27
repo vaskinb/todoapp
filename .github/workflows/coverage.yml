@@ -1,0 +1,55 @@
+name: Run Tests and Generate Coverage Badge
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_USER: todoapp_test
+          POSTGRES_PASSWORD: todoapp_test
+          POSTGRES_DB: todoapp_test
+        ports:
+          - 5432:5432
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install virtualenv
+          virtualenv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
+          pip install pytest pytest-cov anybadge
+
+      - name: Run tests with coverage
+        run: |
+          source venv/bin/activate
+          pytest --cov=app --cov-report=term --cov-report=xml
+
+      - name: Generate coverage badge
+        run: |
+          COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | awk '{print $1*100"%"}')
+          anybadge --value=$COVERAGE --file=coverage.svg coverage
+
+      - name: Upload coverage badge
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-badge
+          path: coverage.svg
