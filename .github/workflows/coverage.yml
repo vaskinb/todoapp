@@ -49,7 +49,7 @@ jobs:
         run: |
           source venv/bin/activate
           COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | awk '{print int($1*100)}')
-          anybadge --label="coverage" --value="$COVERAGE%" --file=coverage.svg coverage
+          anybadge --label="coverage" --value="$COVERAGE" --file=coverage.svg coverage
 
       - name: Upload coverage badge
         uses: actions/upload-artifact@v4
