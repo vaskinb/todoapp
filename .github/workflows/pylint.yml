@@ -42,6 +42,14 @@ jobs:
           SCORE=$(grep -oP '(?<=rated at )\d+(\.\d+)?' pylint.txt)
           echo "Pylint score: $SCORE"
           anybadge --label="pylint" --value="$SCORE/10" --file=pylint.svg
+      
+      - name: Commit and push badge to repo
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add pylint.svg
+          git commit -m "Update pylint badge" || echo "No changes to commit"
+          git push
 
       - name: Delete existing badge release (if exists)
         continue-on-error: true
