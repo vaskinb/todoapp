@@ -1,5 +1,9 @@
 name: Pylint
 
+permissions:
+  contents: write
+  releases: write
+
 on:
   push:
     branches:
@@ -23,14 +27,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements.txt
           pip install pylint anybadge
 
       - name: Run pylint and save output
         run: |
+          source venv/bin/activate
           pylint app --disable=missing-docstring,no-member | tee pylint.txt
 
       - name: Extract pylint score and generate badge
         run: |
+          source venv/bin/activate
           SCORE=$(grep -oP '(?<=rated at )\d+(\.\d+)?' pylint.txt)
           echo "Pylint score: $SCORE"
           anybadge --label="pylint" --value="$SCORE/10" --file=pylint.svg
