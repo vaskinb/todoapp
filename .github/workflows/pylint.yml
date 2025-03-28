@@ -58,12 +58,7 @@ jobs:
           body: 'Release for storing generated badges'
           draft: false
           prerelease: false
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload pylint badge as release asset
-        uses: ncipollo/release-action@v1
-        with:
-          tag: badge
-          files: pylint.svg
+          allowUpdates: true
           replacesArtifacts: true
+          artifacts: "pylint.svg"
           token: ${{ secrets.GITHUB_TOKEN }}
