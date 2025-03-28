@@ -58,3 +58,5 @@ jobs:
         with:
           tag: badge
           files: pylint.svg
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
