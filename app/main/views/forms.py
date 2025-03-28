@@ -11,10 +11,10 @@ from flask_wtf import FlaskForm
 # --- WTForms ---
 # -----------------------------------------------------------------------------
 from wtforms import(
-    PasswordField, BooleanField, SubmitField, StringField, SelectField
+    StringField, SelectField
 )
 from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
+from wtforms.validators import DataRequired, Length, Optional
 
 # -----------------------------------------------------------------------------
 # --- Utils ---

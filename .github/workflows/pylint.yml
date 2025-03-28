@@ -1,0 +1,52 @@
+name: Pylint
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pylint anybadge
+
+      - name: Run pylint and save output
+        run: |
+          pylint app --disable=missing-docstring,no-member | tee pylint.txt
+
+      - name: Extract pylint score and generate badge
+        run: |
+          SCORE=$(grep -oP '(?<=rated at )\d+(\.\d+)?' pylint.txt)
+          echo "Pylint score: $SCORE"
+          anybadge --label="pylint" --value="$SCORE/10" --file=pylint.svg
+
+      - name: Create or update badge release
+        id: create_release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: badge
+          name: Badge Release
+          body: 'Release for storing generated badges'
+          draft: false
+          prerelease: false
+
+      - name: Upload pylint badge as release asset
+        uses: ncipollo/release-action@v1
+        with:
+          tag: badge
+          files: pylint.svg

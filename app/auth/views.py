@@ -63,11 +63,10 @@ def login():
                 request.args.get('next') or url_for('main.index')
             )
 
-        else:
-            # -----------------------------------------------------------------
-            # --- Wrong password ---
-            # -----------------------------------------------------------------
-            form.email.errors.append('Email or password are wrong')
+        # ---------------------------------------------------------------------
+        # --- Wrong password ---
+        # ---------------------------------------------------------------------
+        form.email.errors.append('Email or password are wrong')
 
     # -------------------------------------------------------------------------
     return render_template('auth/auth.html', form=form)

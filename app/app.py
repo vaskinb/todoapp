@@ -25,6 +25,7 @@ from app.auth.views import auth as auth_blueprint
 from app.main.views.dashboard.main import main_bp
 from app.main.views.calendar.calendar import calendar_bp
 from app.main.views.statistic.statistic import statistic_bp
+from app.main.views.errors.errors_test import test_errors_bp
 
 # -----------------------------------------------------------------------------
 # --- Config ---
@@ -82,7 +83,6 @@ def create_admin_app(config_path: str = "conf/development.conf") -> Flask:
     # --- Register blueprints for tests ---
     # -------------------------------------------------------------------------
     if app.config.get("TESTING"):
-        from app.main.views.errors.errors_test import test_errors_bp
         app.register_blueprint(test_errors_bp)
 
     return app
