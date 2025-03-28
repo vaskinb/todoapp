@@ -43,8 +43,14 @@ jobs:
           echo "Pylint score: $SCORE"
           anybadge --label="pylint" --value="$SCORE/10" --file=pylint.svg
 
-      - name: Create or update badge release
-        id: create_release
+      - name: Delete existing badge release (if exists)
+        continue-on-error: true
+        run: |
+          gh release delete badge -y || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create new badge release
         uses: ncipollo/release-action@v1
         with:
           tag: badge
@@ -52,7 +58,6 @@ jobs:
           body: 'Release for storing generated badges'
           draft: false
           prerelease: false
-          skipIfReleaseExists: true
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload pylint badge as release asset
