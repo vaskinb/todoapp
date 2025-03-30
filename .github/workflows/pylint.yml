@@ -41,7 +41,7 @@ jobs:
           source venv/bin/activate
           SCORE=$(grep -oP '(?<=rated at )\d+(\.\d+)?' pylint.txt)
           echo "Pylint score: $SCORE"
-          anybadge --label="pylint" --value="$SCORE/10" --file=pylint.svg
+          anybadge --overwrite --label="pylint" --value="$SCORE/10" --file=pylint.svg
       
       - name: Commit and push badge to repo
         run: |

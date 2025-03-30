@@ -25,6 +25,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          persist-credentials: true  # дозволяє автоматично використовувати токен для push
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -49,7 +51,7 @@ jobs:
         run: |
           source venv/bin/activate
           COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | head -n1 | awk '{print int($1*100)}')
-          anybadge --label="coverage" --value="${COVERAGE}%" --file=coverage.svg
+          anybadge --overwrite --label="coverage" --value="${COVERAGE}%" --file=coverage.svg
 
       - name: Commit and push coverage badge
         run: |
