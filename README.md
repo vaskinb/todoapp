@@ -1,6 +1,6 @@
 # TODO APP
 
-![Coverage](https://github.com/vaskinb/todoapp/actions/workflows/coverage.yml/badge.svg)
+![Coverage](https://raw.githubusercontent.com/vaskinb/todoapp/master/coverage.svg)
 ![Pylint](https://raw.githubusercontent.com/vaskinb/todoapp/master/pylint.svg)
 
 ![dashboard](https://github.com/user-attachments/assets/615f058a-2fda-4d64-8e16-3832553fca2f)
