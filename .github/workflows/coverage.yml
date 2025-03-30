@@ -56,13 +56,13 @@ jobs:
       - name: Debug coverage value
         run: |
           source venv/bin/activate
-          COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | head -n1 | awk '{print int($1 * 100)}')
+          COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' coverage.xml | head -n1 | awk '{printf "%d", $1 * 100}')
           echo "Extracted coverage: $COVERAGE"
 
       - name: Generate coverage badge
         run: |
           source venv/bin/activate
-          COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | head -n1 | awk '{print int($1 * 100)}')
+          COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' coverage.xml | head -n1 | awk '{printf "%d", $1 * 100}')
           echo "Coverage is: $COVERAGE%"
           anybadge --overwrite --label="coverage" --value="${COVERAGE}%" --file=coverage.svg
 
