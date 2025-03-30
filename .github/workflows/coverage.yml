@@ -29,7 +29,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true  # дозволяє автоматично використовувати токен для push
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -56,13 +56,13 @@ jobs:
       - name: Debug coverage value
         run: |
           source venv/bin/activate
-          COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | head -n1 | awk '{print int($1*100)}')
+          COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | head -n1 | awk '{print int($1 * 100)}')
           echo "Extracted coverage: $COVERAGE"
 
       - name: Generate coverage badge
         run: |
           source venv/bin/activate
-          COVERAGE=$(awk -F '"' '/<coverage line-rate/ {print $2*100}' coverage.xml | awk '{print int($1)}')
+          COVERAGE=$(grep -oP '(?<=<coverage line-rate=")[0-9.]+' coverage.xml | head -n1 | awk '{print int($1 * 100)}')
           echo "Coverage is: $COVERAGE%"
           anybadge --overwrite --label="coverage" --value="${COVERAGE}%" --file=coverage.svg
 
