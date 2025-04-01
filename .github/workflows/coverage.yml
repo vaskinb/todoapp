@@ -50,15 +50,6 @@ jobs:
           source venv/bin/activate
           pytest --cov=app --cov-report=term --cov-report=xml
 
-      - name: Debug coverage.xml
-        run: cat coverage.xml
-
-      - name: Debug coverage value
-        run: |
-          source venv/bin/activate
-          COVERAGE=$(grep -oP 'line-rate="\K[0-9.]+' coverage.xml | head -n1 | awk '{printf "%d", $1 * 100}')
-          echo "Extracted coverage: $COVERAGE"
-
       - name: Generate coverage badge
         run: |
           source venv/bin/activate
