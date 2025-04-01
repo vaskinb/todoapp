@@ -125,8 +125,8 @@ def authenticated_admin_user(client: Flask) -> Flask:
     client.post(
         url_for('auth.login'),
         data={
-            'email': 'admin@gmail.com',
-            'password': 'admin@gmail.com',
+            'email': TEST_USERS['admin']['email'],
+            'password': TEST_USERS['admin']['password'],
             'remember_me': 'true'
         },
         follow_redirects=True,
@@ -139,8 +139,8 @@ def authenticated_user(client: Flask) -> Flask:
     client.post(
         url_for('auth.login'), follow_redirects=True,
         data={
-            'email': 'user@gmail.com',
-            'password': 'user@gmail.com',
+            'email': TEST_USERS['user']['email'],
+            'password': TEST_USERS['user']['password'],
             'remember_me': 'true'
         }
     )
