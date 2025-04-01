@@ -133,7 +133,7 @@ apt install postgresql postgresql-contrib
 * Створення БД PostgreSQL
 ```
 $ sudo -u postgres psql
-postgres=# create database limitless;
+postgres=# create database todoapp;
 postgres=# create user todoapp with encrypted password 'todoapp';
 postgres=# grant all privileges on database todoapp to todoapp;
 ```
