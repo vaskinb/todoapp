@@ -12,6 +12,7 @@ class ConfigPath:
     development = "conf/development.conf"
     production = "conf/production.conf"
     pytest = "conf/pytests.conf"
+    docker = "conf/docker.conf"
 
 
 class Config:

@@ -15,14 +15,12 @@ else
             # -----------------------------------------------------------------
             # --- Save requirements to file ---
             # -----------------------------------------------------------------
-            source venv/bin/activate
             pip freeze | grep -v "pkg-resources" > requirements.txt
         ;;
         db)
             # -----------------------------------------------------------------
             # --- Migrations ---
             # -----------------------------------------------------------------
-            source venv/bin/activate
             export FLASK_APP='manage'
             flask db $2
         ;;
