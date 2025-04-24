@@ -194,3 +194,50 @@ virtualenv -p python3 venv
 pip install -r requirements.txt
 ```
 </details>
+
+### Docker
+
+<details><summary>Запуск через Docker</summary>
+
+#### Встановлення Docker та Docker Compose
+
+* Оновлення списку пакетів та установка Docker Engine:
+```shell
+sudo apt update && sudo apt install -y docker.io
+```
+
+* Додавання користувача в групу docker:
+
+```shell
+sudo usermod -aG docker $USER
+```
+
+* Встановлення Docker Compose:
+
+```shell
+sudo apt install -y docker-compose
+```
+
+#### Запуск додатку через Docker
+
+* Клонувати репозиторій:
+
+```shell
+git clone https://github.com/vaskinb/todoapp.git
+cd todoapp
+```
+
+* Запуск контейнерів:
+
+```shell
+docker-compose up --build
+```
+
+* Зупинка контейнерів:
+
+```shell
+docker-compose down
+```
+
+
+</details>
