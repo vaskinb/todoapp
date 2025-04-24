@@ -34,13 +34,21 @@ from config import ConfigPath
 prod_conf = ConfigPath.production
 dev_conf = ConfigPath.development
 test_conf = ConfigPath.pytest
+docker_conf = ConfigPath.docker
+
 
 # -----------------------------------------------------------------------------
 # --- Mode detection ---
 # -----------------------------------------------------------------------------
+is_docker = os.environ.get("IS_DOCKER") == "1"
 application_mode = str(sys.argv[1])
 
-if application_mode in ["tests", "coverage"]:
+# -----------------------------------------------------------------------------
+# --- Config path resolution ---
+# -----------------------------------------------------------------------------
+if is_docker:
+    config_path = docker_conf
+elif application_mode in ["tests", "coverage"]:
     config_path = test_conf
 else:
     config_path = prod_conf if os.path.isfile(prod_conf) else dev_conf
