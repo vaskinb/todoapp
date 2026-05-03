@@ -184,7 +184,7 @@ git clone git@github.com:vaskinb/todoapp.git
 
 ``` shell
 apt install virtualenv
-virtualenv -p python3 venv
+virtualenv -p python3.11 venv
 . venv/bin/activate
 ```
 
