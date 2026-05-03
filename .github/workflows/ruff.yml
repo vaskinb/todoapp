@@ -1,0 +1,71 @@
+name: Ruff
+
+permissions:
+  contents: write
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m venv venv
+          source venv/bin/activate
+          pip install -r requirements-dev.txt
+          pip install anybadge
+
+      - name: Run Ruff and save output
+        run: |
+          source venv/bin/activate
+          ruff check app tests config.py manage.py wsgi_admin.py | tee ruff.txt
+
+      - name: Generate Ruff badge
+        run: |
+          source venv/bin/activate
+          anybadge --overwrite --label="ruff" --value="passing" --file=ruff.svg green
+
+      - name: Commit and push badge to repo
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add ruff.svg
+          git commit -m "Update ruff badge" || echo "No changes to commit"
+          git pull --rebase
+          git push
+
+      - name: Delete existing Ruff badge release (if exists)
+        continue-on-error: true
+        run: |
+          gh release delete ruff -y || true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create new Ruff badge release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ruff
+          name: Ruff Badge Release
+          body: 'Release for storing generated Ruff badge'
+          draft: false
+          prerelease: false
+          allowUpdates: true
+          replacesArtifacts: true
+          artifacts: "ruff.svg"
+          token: ${{ secrets.GITHUB_TOKEN }}

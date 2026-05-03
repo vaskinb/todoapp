@@ -2,6 +2,7 @@
 
 ![Coverage](https://raw.githubusercontent.com/vaskinb/todoapp/master/coverage.svg)
 ![Pylint](https://raw.githubusercontent.com/vaskinb/todoapp/master/pylint.svg)
+![Ruff](https://raw.githubusercontent.com/vaskinb/todoapp/master/ruff.svg)
 
 ![dashboard](https://github.com/user-attachments/assets/615f058a-2fda-4d64-8e16-3832553fca2f)
 ![calendar](https://github.com/user-attachments/assets/923a9a4f-01df-4e83-b945-851ca4c5b066)
