@@ -39,7 +39,7 @@ jobs:
       - name: Generate Ruff badge
         run: |
           source venv/bin/activate
-          anybadge --overwrite --label="ruff" --value="passing" --file=ruff.svg --default-color=green
+          anybadge --overwrite --label="ruff" --value="passing" --file=ruff.svg -c green
 
       - name: Commit and push badge to repo
         run: |
