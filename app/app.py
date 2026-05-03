@@ -9,23 +9,22 @@ from typing import Union
 # --- Flask ---
 # -----------------------------------------------------------------------------
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager, current_user
-from flask_principal import Principal, Identity
+from flask_principal import Identity, Principal
+from flask_sqlalchemy import SQLAlchemy
+
+# --- Blueprints ---
+# -----------------------------------------------------------------------------
+from app.auth.views import auth as auth_blueprint
+from app.main.views.calendar.calendar import calendar_bp
+from app.main.views.dashboard.main import main_bp
+from app.main.views.errors.errors_test import test_errors_bp
+from app.main.views.statistic.statistic import statistic_bp
 
 # -----------------------------------------------------------------------------
 # --- Models ---
 # -----------------------------------------------------------------------------
 from app.models import User
-
-# -----------------------------------------------------------------------------
-# --- Blueprints ---
-# -----------------------------------------------------------------------------
-from app.auth.views import auth as auth_blueprint
-from app.main.views.dashboard.main import main_bp
-from app.main.views.calendar.calendar import calendar_bp
-from app.main.views.statistic.statistic import statistic_bp
-from app.main.views.errors.errors_test import test_errors_bp
 
 # -----------------------------------------------------------------------------
 # --- Config ---

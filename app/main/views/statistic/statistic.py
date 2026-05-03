@@ -12,7 +12,7 @@ from typing import Dict
 # --- Flask ---
 # -----------------------------------------------------------------------------
 from flask import render_template
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 
 # -----------------------------------------------------------------------------
 # --- SQLAlchemy ---
@@ -25,15 +25,9 @@ from sqlalchemy import func
 from app import models
 
 # -----------------------------------------------------------------------------
-# --- Errors ---
-# -----------------------------------------------------------------------------
-from app.main.views.errors import errors
-
-# -----------------------------------------------------------------------------
 # --- Blueprint ---
 # -----------------------------------------------------------------------------
 from app.main.views import statistic_bp
-
 
 # -----------------------------------------------------------------------------
 #  ______   ______  ______   ______  __   ______   ______  __   ______
@@ -186,4 +180,3 @@ def main() -> str:
     stat = get_tasks_statistics(current_user.id)
 
     return render_template("statistic/statistic.html", stat=stat)
-

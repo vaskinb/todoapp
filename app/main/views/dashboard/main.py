@@ -5,8 +5,8 @@ import datetime
 # -----------------------------------------------------------------------------
 # --- Flask ---
 # -----------------------------------------------------------------------------
-from flask import render_template, jsonify, request, abort, Response
-from flask_login import login_required, current_user
+from flask import Response, abort, jsonify, render_template, request
+from flask_login import current_user, login_required
 
 # -----------------------------------------------------------------------------
 # --- Models ---
@@ -14,14 +14,13 @@ from flask_login import login_required, current_user
 from app import models
 
 # -----------------------------------------------------------------------------
-# --- Errors ---
-# -----------------------------------------------------------------------------
-from app.main.views.errors import errors
-
-# -----------------------------------------------------------------------------
 # --- Blueprint ---
 # -----------------------------------------------------------------------------
 from app.main.views import main_bp
+
+# -----------------------------------------------------------------------------
+# --- Forms ---
+# -----------------------------------------------------------------------------
 from app.main.views.forms import TaskForm
 
 

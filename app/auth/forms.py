@@ -8,8 +8,8 @@ from flask_wtf import FlaskForm
 # -----------------------------------------------------------------------------
 # --- WTForms ---
 # -----------------------------------------------------------------------------
-from wtforms import PasswordField, BooleanField, SubmitField, StringField
-from wtforms.validators import DataRequired, Email, Length, Optional, EqualTo
+from wtforms import BooleanField, PasswordField, StringField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo, Length, Optional
 
 
 class LoginForm(FlaskForm):

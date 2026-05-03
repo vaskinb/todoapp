@@ -15,5 +15,8 @@ extend-exclude = [
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 
+[tool.ruff.lint.per-file-ignores]
+"app/auth/__init__.py" = ["E402", "F401"]
+
 [tool.ruff.lint.isort]
-known-first-party = ["app", "tests"]
+known-first-party = ["app", "config", "tests"]
