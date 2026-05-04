@@ -46,9 +46,13 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "actions@github.com"
           git add ruff.svg
-          git commit -m "Update ruff badge" || echo "No changes to commit"
-          git pull --rebase
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Update ruff badge"
+            git pull --rebase
+            git push
+          fi
 
       - name: Delete existing Ruff badge release (if exists)
         continue-on-error: true
